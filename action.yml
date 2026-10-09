@@ -1,0 +1,40 @@
+name: Verbatim Guard
+description: Check AI quotations against supplied text and fail on missing, misplaced, ambiguous, or stale evidence.
+author: WaitedDegree608
+branding:
+  icon: check-circle
+  color: blue
+inputs:
+  bundle:
+    description: Path to a self-contained UTF-8 evidence JSON bundle in the checked-out repository.
+    required: true
+  mode:
+    description: Matching mode (exact or whitespace).
+    default: exact
+outputs:
+  ok:
+    description: Whether every quotation passed (true or false).
+    value: ${{ steps.verify.outputs.ok }}
+  input-valid:
+    description: Whether the bundle was read and validated (true or false).
+    value: ${{ steps.verify.outputs.input-valid }}
+  passed:
+    description: Number of quotations that passed; zero for invalid input.
+    value: ${{ steps.verify.outputs.passed }}
+  failed:
+    description: Number of quotations that failed; zero for invalid input.
+    value: ${{ steps.verify.outputs.failed }}
+  total:
+    description: Number of quotations checked; zero for invalid input.
+    value: ${{ steps.verify.outputs.total }}
+runs:
+  using: composite
+  steps:
+    - id: verify
+      shell: bash
+      env:
+        VG_ACTION_PATH: ${{ github.action_path }}
+        VG_BUNDLE: ${{ inputs.bundle }}
+        VG_MODE: ${{ inputs.mode }}
+        PYTHONIOENCODING: utf-8
+      run: python -I "$VG_ACTION_PATH/action/run.py"

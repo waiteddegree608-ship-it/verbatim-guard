@@ -12,6 +12,29 @@ from .bundle import check_bundle
 MAX_BYTES = 8 * 1024 * 1024
 
 
+def load_bundle(path):
+    """Read one bounded UTF-8 bundle; reject duplicate JSON object keys."""
+    if path == '-':
+        raw = sys.stdin.buffer.read(MAX_BYTES + 1)
+    else:
+        with open(path, 'rb') as stream:
+            raw = stream.read(MAX_BYTES + 1)
+    return parse_bundle(raw)
+
+
+def parse_bundle(raw):
+    if len(raw) > MAX_BYTES:
+        raise ValueError('Input exceeds the 8 MiB limit')
+    def unique_keys(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError('Duplicate JSON key: ' + key)
+            result[key] = value
+        return result
+    return json.loads(raw.decode('utf-8-sig'), object_pairs_hook=unique_keys)
+
+
 def render_text(report):
     lines = [f'Verbatim Guard | {report["mode"]} mode', '']
     for row in report['results']:
@@ -55,22 +78,9 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         if args.command == 'demo':
-            raw = files('verbatim_guard').joinpath('demo.json').read_bytes()
-        elif args.bundle == '-':
-            raw = sys.stdin.buffer.read(MAX_BYTES + 1)
+            bundle = parse_bundle(files('verbatim_guard').joinpath('demo.json').read_bytes())
         else:
-            with open(args.bundle, 'rb') as stream:
-                raw = stream.read(MAX_BYTES + 1)
-        if len(raw) > MAX_BYTES:
-            raise ValueError('Input exceeds the 8 MiB limit')
-        def unique_keys(pairs):
-            result = {}
-            for key, value in pairs:
-                if key in result:
-                    raise ValueError('Duplicate JSON key: ' + key)
-                result[key] = value
-            return result
-        bundle = json.loads(raw.decode('utf-8-sig'), object_pairs_hook=unique_keys)
+            bundle = load_bundle(args.bundle)
         report = check_bundle(bundle, mode=args.mode)
         rendered = (json.dumps(report, ensure_ascii=False, indent=2) + '\n' if args.format == 'json'
                     else render_html(report) if args.format == 'html' else render_text(report))
@@ -80,6 +90,6 @@ def main(argv=None):
             sys.stdout.write(rendered)
         # Demo deliberately includes bad quotations; its exit code remains 1.
         return 0 if report['ok'] else 1
-    except (ValueError, OSError, UnicodeError) as error:
+    except (ValueError, OSError, UnicodeError, RecursionError) as error:
         print(f'verbatim-guard: {error}', file=sys.stderr)
         return 2

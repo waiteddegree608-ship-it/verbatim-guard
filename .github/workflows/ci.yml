@@ -20,3 +20,27 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - run: python -m verbatim_guard check examples/passing.json
       - run: python examples/from_model.py
+      - name: Verify composite action success
+        id: evidence
+        uses: ./
+        with:
+          bundle: examples/passing.json
+      - name: Verify action outputs
+        shell: bash
+        env:
+          VG_OK: ${{ steps.evidence.outputs.ok }}
+          VG_TOTAL: ${{ steps.evidence.outputs.total }}
+        run: test "$VG_OK" = true && test "$VG_TOTAL" = 2
+      - name: Verify composite action rejects bad quotations
+        id: expected_failure
+        continue-on-error: true
+        uses: ./
+        with:
+          bundle: src/verbatim_guard/demo.json
+          mode: whitespace
+      - name: Verify rejection outcome
+        shell: bash
+        env:
+          VG_OUTCOME: ${{ steps.expected_failure.outcome }}
+          VG_FAILED: ${{ steps.expected_failure.outputs.failed }}
+        run: test "$VG_OUTCOME" = failure && test "$VG_FAILED" = 4

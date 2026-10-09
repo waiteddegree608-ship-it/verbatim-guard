@@ -4,7 +4,7 @@
 
 一个本地运行的 Python 库和命令行工具，用于检查引文、行号范围和原文指纹。不需要 API Key，不调用另一个模型，没有运行时第三方依赖。
 
-[English](README.md) · [下载发行版](https://github.com/waiteddegree608-ship-it/verbatim-guard/releases) · [报告示例](https://github.com/waiteddegree608-ship-it/verbatim-guard/releases/download/v0.1.0/demo-report.html)
+[English](README.md) · [下载发行版](https://github.com/waiteddegree608-ship-it/verbatim-guard/releases) · [报告示例](https://github.com/waiteddegree608-ship-it/verbatim-guard/releases/download/v0.2.0/demo-report.html)
 
 ![原文中是 48 位参与者，AI 引文写成 480；检查结果为 NOT_FOUND。](docs/overview.svg)
 
@@ -15,7 +15,7 @@
 需要 Python 3.10 或以上。从 GitHub 安装版本固定的 wheel，不需要 Git：
 
 ```sh
-python -m pip install "https://github.com/waiteddegree608-ship-it/verbatim-guard/releases/download/v0.1.0/verbatim_guard-0.1.0-py3-none-any.whl"
+python -m pip install "https://github.com/waiteddegree608-ship-it/verbatim-guard/releases/download/v0.2.0/verbatim_guard-0.2.0-py3-none-any.whl"
 verbatim-guard demo --mode whitespace
 ```
 
@@ -37,6 +37,33 @@ cd verbatim-guard
 python -m pip install .
 verbatim-guard check examples/passing.json
 ```
+
+## 在 GitHub PR 中自动检查
+
+新增 GitHub Action：检查失败会让步骤失败，并显示错误提示和任务摘要。不需要安装 Python 包，也不需要 API Key；需先准备 Python 3.10+。
+
+将 [examples/passing.json](examples/passing.json) 复制为仓库里的 `evidence.json`，再把下面内容保存为 `.github/workflows/evidence.yml` 即可试用：
+
+```yaml
+name: Evidence checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: waiteddegree608-ship-it/verbatim-guard@v0.2.0
+        with:
+          bundle: evidence.json
+          mode: exact
+```
+
+试用后换成自己的原文和引文。Action 最多输出 50 条错误提示，摘要保留全部统计；`ok`、`input-valid`、`passed`、`failed`、`total` 输出可供后续步骤使用。错误提示包含引文 ID 和来源 ID，不包含原文片段。它仍然只检查你提供的文本，不会从 PR、PDF 或网页自动提取证据。[完整接入说明](docs/github-action.md)。
 
 ## 接入现有程序
 

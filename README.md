@@ -11,7 +11,7 @@ Check quotations, line ranges, and source fingerprints — locally, without anot
 [![Runtime dependencies](https://img.shields.io/badge/runtime_dependencies-0-75d5c0)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[中文说明](README.zh-CN.md) · [Try the demo](#try-it-in-a-minute) · [Python API](#python-api) · [Releases](https://github.com/waiteddegree608-ship-it/verbatim-guard/releases)
+[中文说明](README.zh-CN.md) · [Try the demo](#try-it-in-a-minute) · [GitHub Action](#check-evidence-in-pull-requests) · [Python API](#python-api) · [Releases](https://github.com/waiteddegree608-ship-it/verbatim-guard/releases)
 
 ![An original source says 48 participants; an AI quotation says 480. Verbatim Guard marks the invented quotation NOT_FOUND.](docs/overview.svg)
 
@@ -26,7 +26,7 @@ Verbatim Guard checks those mechanical errors before you show a generated answer
 Python 3.10 or later. Install the versioned wheel directly from GitHub; no Git client or API key is needed:
 
 ```sh
-python -m pip install "https://github.com/waiteddegree608-ship-it/verbatim-guard/releases/download/v0.1.0/verbatim_guard-0.1.0-py3-none-any.whl"
+python -m pip install "https://github.com/waiteddegree608-ship-it/verbatim-guard/releases/download/v0.2.0/verbatim_guard-0.2.0-py3-none-any.whl"
 verbatim-guard demo --mode whitespace
 ```
 
@@ -50,7 +50,7 @@ The demo intentionally contains bad quotations and **exits with code 1**. That i
 verbatim-guard demo --mode whitespace --format html --output report.html
 ```
 
-Open `report.html` in your browser. Or download the synthetic [sample HTML report](https://github.com/waiteddegree608-ship-it/verbatim-guard/releases/download/v0.1.0/demo-report.html). Reports contain matching source excerpts; inspect them before sharing.
+Open `report.html` in your browser. Or download the synthetic [sample HTML report](https://github.com/waiteddegree608-ship-it/verbatim-guard/releases/download/v0.2.0/demo-report.html). Reports contain matching source excerpts; inspect them before sharing.
 
 Prefer a source install?
 
@@ -62,6 +62,33 @@ verbatim-guard check examples/passing.json
 ```
 
 The package is distributed through GitHub Releases for this version. It is **not published to PyPI**.
+
+## Check evidence in pull requests
+
+Add an evidence check to your repository. It fails on bad quotations and writes error annotations plus a job summary. No pip install or API key is needed for the action.
+
+Save this as `.github/workflows/evidence.yml` and copy [examples/passing.json](examples/passing.json) to `evidence.json` to try it:
+
+```yaml
+name: Evidence checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: waiteddegree608-ship-it/verbatim-guard@v0.2.0
+        with:
+          bundle: evidence.json
+          mode: exact
+```
+
+Use your own source text and quotations after trying the example. The action returns counts as outputs, emits up to 50 error annotations, and summarizes every result. It does not publish your source excerpts. [Inputs, outputs, and limitations →](docs/github-action.md)
 
 ## What it catches
 

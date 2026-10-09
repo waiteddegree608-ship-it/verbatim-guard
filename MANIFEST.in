@@ -1,0 +1,3 @@
+include README.zh-CN.md CONTRIBUTING.md CHANGELOG.md
+recursive-include docs *.svg
+recursive-include examples *.json *.py

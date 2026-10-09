@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "verbatim-guard"
+version = "0.1.0"
+description = "Offline checks for AI quotations, source line ranges, and stale source fingerprints."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "WaitedDegree608"}]
+keywords = ["llm", "rag", "citation", "quotes", "validation"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/waiteddegree608-ship-it/verbatim-guard"
+Issues = "https://github.com/waiteddegree608-ship-it/verbatim-guard/issues"
+
+[project.scripts]
+verbatim-guard = "verbatim_guard.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+verbatim_guard = ["demo.json"]

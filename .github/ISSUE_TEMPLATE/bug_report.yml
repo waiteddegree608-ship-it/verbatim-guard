@@ -1,0 +1,21 @@
+name: Report a matching bug
+description: Show a small example where the evidence check behaves incorrectly.
+body:
+  - type: textarea
+    id: example
+    attributes:
+      label: Minimal input
+      description: Use synthetic text. Do not include private documents or credentials.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual result
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Version, Python version, and operating system

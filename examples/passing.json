@@ -1,0 +1,7 @@
+{
+  "sources": {"study.txt": "Pilot study\nThe trial included 48 participants.\nMean response time was 240 ms.\n"},
+  "claims": [
+    {"id": "sample-size", "source": "study.txt", "quote": "The trial included 48 participants.", "lines": [2, 2]},
+    {"id": "latency", "source": "study.txt", "quote": "Mean response time was 240 ms.", "lines": [3, 3]}
+  ]
+}

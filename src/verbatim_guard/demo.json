@@ -1,0 +1,13 @@
+{
+  "sources": {
+    "study.txt": "Pilot study\nThe trial included 48 participants.\nMean response time was 240 ms.\nThe result was preliminary.\nThe result was preliminary.\nWrapped text stays\ntraceable to its source.\n"
+  },
+  "claims": [
+    {"id": "faithful", "source": "study.txt", "quote": "The trial included 48 participants.", "lines": [2, 2]},
+    {"id": "invented-number", "source": "study.txt", "quote": "The trial included 480 participants."},
+    {"id": "wrong-line", "source": "study.txt", "quote": "Mean response time was 240 ms.", "lines": [2, 2]},
+    {"id": "repeated", "source": "study.txt", "quote": "The result was preliminary."},
+    {"id": "missing-document", "source": "missing.txt", "quote": "A plausible sounding quote."},
+    {"id": "wrapped", "source": "study.txt", "quote": "Wrapped text stays traceable to its source."}
+  ]
+}
